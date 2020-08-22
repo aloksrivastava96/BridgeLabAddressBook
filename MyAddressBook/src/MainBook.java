@@ -7,11 +7,115 @@ import javax.swing.JButton;
 import java.awt.Color;
 import javax.swing.JLabel;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
 import java.awt.event.ActionEvent;
 
-public class MainBook {
+import javax.tools.FileObject;
+import java.util.*;
+import java.io.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
+public class MainBook implements Serializable{
+	
+	public int numberofaddressbook=0;
+	public List<MainBook> list = new LinkedList<MainBook>();
+	public Map<String, List<MainBook>> map = new HashMap<String, List<MainBook>>();
+	
+	public String[] addressbook = new String[10];
+	MainBook person;
+	//Scanner scanner = new Scanner(System.in);
+	public String value = "";
+	public String key = "";
+	
+	@Override
+	public String toString() {
+		return firstname + "\t\t" + lastname + "\t\t" + address + "\t\t" + city + "\t\t" + state + "\t\t" + zip + "\t\t"
+				+ phone;
+	}
+
+	private String firstname;
+	private String lastname;
+	private String address;
+	private String city;
+	private String state;
+	private String zip;
+	private String phone;
+
+	public String getFirstname() {
+		return firstname;
+	}
+
+	public void setFirstname(String firstname) {
+		this.firstname = firstname;
+	}
+
+	public String getLastname() {
+		return lastname;
+	}
+
+	public void setLastname(String lastname) {
+		this.lastname = lastname;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public String getZip() {
+		return zip;
+	}
+
+	public void setZip(String zip) {
+		this.zip = zip;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public static Comparator<MainBook> sortbyname = new Comparator<MainBook>() {
+
+		public int compare(MainBook s1, MainBook s2) {
+			String FirstName1 = (String)s1.getLastname();
+			String FirstName2 = (String)s2.getLastname();
+
+			// ascending order
+			return FirstName1.compareTo(FirstName2);
+		}
+	};
+
+	public static Comparator<MainBook> sortbyzip = new Comparator<MainBook>() {
+		public int compare(MainBook s1, MainBook s2) {
+			String Zip1 = s1.getZip();
+			String Zip2 = s2.getZip();
+
+			// ascending order
+			return Zip1.compareTo(Zip2);
+		}
+	};
 
 	private JFrame frame;
 
@@ -23,12 +127,12 @@ public class MainBook {
 		if(!file.exists()) {
 			try {
 				boolean newfile = file.createNewFile();
-				System.out.println(newfile);
+				//System.out.println(newfile);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
-		System.out.println(file.exists());
+		//System.out.println(file.exists());
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -39,6 +143,42 @@ public class MainBook {
 				}
 			}
 		});
+	}
+	
+	public void fileWriter() {
+		FileOutputStream fos;
+		try {
+			fos = new FileOutputStream("filestorage.ser");
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			oos.writeObject(map);
+			oos.writeObject(addressbook);
+			oos.writeInt(numberofaddressbook);
+			oos.writeObject(key);
+			oos.flush();
+			oos.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	public void fileReader() {
+		try {
+			FileInputStream fileInputStream = new FileInputStream("filestorage.ser");
+			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+			map = (HashMap) objectInputStream.readObject();
+
+			addressbook = (String[]) objectInputStream.readObject();
+			numberofaddressbook = objectInputStream.readInt();
+			key = (String) objectInputStream.readObject();
+			objectInputStream.close();
+			fileInputStream.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 	/**
@@ -57,19 +197,6 @@ public class MainBook {
 		frame.setBounds(100, 100, 556, 456);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
-		
-		JButton btnNewButton = new JButton("CREATE");
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				frame.dispose();
-				Create c = new Create();
-				c.setVisible(true);
-			}
-		});
-		btnNewButton.setForeground(Color.BLACK);
-		btnNewButton.setBackground(Color.WHITE);
-		btnNewButton.setBounds(59, 80, 89, 23);
-		frame.getContentPane().add(btnNewButton);
 		
 		JLabel lblNewLabel = new JLabel("");
 		Image img = new ImageIcon(this.getClass().getResource("/bridgelab.png")).getImage();
@@ -158,7 +285,25 @@ public class MainBook {
 			}
 		});
 		btnNewButton_7.setBackground(Color.WHITE);
-		btnNewButton_7.setBounds(227, 360, 89, 23);
+		btnNewButton_7.setBounds(227, 361, 89, 23);
 		frame.getContentPane().add(btnNewButton_7);
+		
+		JButton btnNewButton = new JButton("CREATE");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+				Create c = new Create();
+				c.setVisible(true);
+			}
+		});
+		btnNewButton.setBackground(Color.WHITE);
+		btnNewButton.setBounds(59, 80, 89, 23);
+		frame.getContentPane().add(btnNewButton);
+	}
+
+	public void setVisible(boolean b) {
+		// TODO Auto-generated method stub
+		frame.setVisible(true);
+		
 	}
 }
